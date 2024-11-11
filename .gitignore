@@ -1,0 +1,7 @@
+kidney-stone-ultrasound-1/
+datasets/
+runs/
+outputs/
+.env
+venv
+kidney-stone-ultrasound.v1i.yolov8.zip
