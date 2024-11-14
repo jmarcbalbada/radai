@@ -1,9 +1,9 @@
 from ultralytics import YOLO
 
-model = YOLO('plant_id_v2.pt')
+model = YOLO('best141124-1900.pt')
 
-path = 'D:\School\SP\plants\V2'
+path = '.\\kidney_stone.jpg'
 
-save_path='..\\radai\\outputs'
+save_path='..\\outputs\\'
 
 results = model(source=path, conf=0.25, save=True, save_dir=save_path)
