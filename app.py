@@ -17,7 +17,7 @@ st.subheader("Input Options")
 input_option = st.radio("Choose input type", ("Upload Image", "Use Camera"), key="input_radio")
 
 # Dropdown to select the model
-model_option = st.selectbox("Select Model", ("YOLOv11x", "YOLOv8x (Not yet available)"), key="model_dropdown")
+model_option = st.selectbox("Select Model", ("YOLOv11x", "YOLOv8x"), key="model_dropdown")
 
 # Initialize variables
 img_file_buffer = None
@@ -48,23 +48,13 @@ if img_file_buffer or uploaded_image:
 if image_path and st.button("Run Prediction"):
     # URL and API setup based on selected model
     url = "https://predict.ultralytics.com"
-    if model_option == "YOLOv11x":
-        headers = {"x-api-key": "3b5056ac3a9ea918ac838037d777446ba97e9ad3fc"}
-        data = {
-            "model": "https://hub.ultralytics.com/models/eLi9nXp1Q5RnK0HlHBhn",
-            "imgsz": 640,
-            "conf": 0.25,
-            "iou": 0.45,
-        }
-    elif model_option == "YOLOv8x":
-        # Update with YOLOv8x model once available
-        headers = {"x-api-key": "your-api-key-for-yolov8x"}
-        data = {
-            "model": "https://hub.ultralytics.com/models/YOLOv8x",
-            "imgsz": 640,
-            "conf": 0.25,
-            "iou": 0.45,
-        }
+    headers = {"x-api-key": "3b5056ac3a9ea918ac838037d777446ba97e9ad3fc"}
+    data = {
+        "model": "https://hub.ultralytics.com/models/eLi9nXp1Q5RnK0HlHBhn" if model_option == "YOLOv11x" else "https://hub.ultralytics.com/models/SMt917G5PhT5W142f1Iq",
+        "imgsz": 640,
+        "conf": 0.25,
+        "iou": 0.45,
+    }
 
     try:
         # Send the image for inference
