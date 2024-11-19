@@ -17,7 +17,7 @@ st.subheader("Input Options")
 input_option = st.radio("Choose input type", ("Upload Image", "Use Camera"), key="input_radio")
 
 # Dropdown to select the model
-model_option = st.selectbox("Select Model", ("YOLOv11x", "YOLOv8x"), key="model_dropdown")
+model_option = st.selectbox("Select Model", ("YOLOv11m", "YOLOv8m"), key="model_dropdown")
 
 # Initialize variables
 img_file_buffer = None
