@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO('best141124-1900.pt')
+model = YOLO('best171124.pt')
 
 path = '.\\kidney_stone.jpg'
 

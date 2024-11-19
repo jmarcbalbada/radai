@@ -5,3 +5,4 @@ outputs/
 .env
 venv
 kidney-stone-ultrasound.v1i.yolov8.zip
+datasets.zip
