@@ -16,9 +16,6 @@ st.markdown("""
 st.subheader("Input Options")
 input_option = st.radio("Choose input type", ("Upload Image", "Use Camera"), key="input_radio")
 
-# Dropdown to select the model
-model_option = st.selectbox("Select Model", ("YOLOv11m", "YOLOv8m"), key="model_dropdown")
-
 # Initialize variables
 img_file_buffer = None
 uploaded_image = None
@@ -45,104 +42,101 @@ if img_file_buffer or uploaded_image:
         st.success(f"Image saved as '{image_path}'")
 
 # Inference and Overlay
-if image_path and st.button("Run Prediction"):
-    # URL and API setup based on selected model
-    url = "https://predict.ultralytics.com"
-    headers = {"x-api-key": "3b5056ac3a9ea918ac838037d777446ba97e9ad3fc"}
-    data = {
-        "model": "https://hub.ultralytics.com/models/eLi9nXp1Q5RnK0HlHBhn" if model_option == "YOLOv11x" else "https://hub.ultralytics.com/models/SMt917G5PhT5W142f1Iq",
-        "imgsz": 640,
-        "conf": 0.25,
-        "iou": 0.45,
-    }
+if image_path:
+    # Display the loading message while making predictions
+    with st.spinner("Predicting, please wait..."):
+        # URLs and API setup for both models
+        url_yolov11 = "https://predict.ultralytics.com"
+        url_yolov8 = "https://predict.ultralytics.com"
+        headers = {"x-api-key": "3b5056ac3a9ea918ac838037d777446ba97e9ad3fc"}
+        data = {
+            "model": "https://hub.ultralytics.com/models/eLi9nXp1Q5RnK0HlHBhn",  # YOLOv11m
+            "imgsz": 640,
+            "conf": 0.25,
+            "iou": 0.45,
+        }
 
-    try:
-        # Send the image for inference
-        with open(image_path, "rb") as f:
-            response = requests.post(url, headers=headers, data=data, files={"file": f})
-        response.raise_for_status()
-
-        # Parse results
-        results = response.json()
-
-        # Load the image
-        original_image = Image.open(image_path)
-        draw = ImageDraw.Draw(original_image)
-
-        # Optional: Load a font for text (fallback if not found)
         try:
-            font = ImageFont.truetype("arial.ttf", 20)
-        except IOError:
-            font = ImageFont.load_default()
+            # Send the image for inference for YOLOv11m
+            with open(image_path, "rb") as f:
+                response_v11 = requests.post(url_yolov11, headers=headers, data=data, files={"file": f})
+            response_v11.raise_for_status()
+            results_v11 = response_v11.json()
 
-        # Flag to check if Kidney Stone or Normal Kidney is detected
-        kidney_stone_detected = False
-        normal_kidney_detected = False
-        total_confidence = 0
-        kidney_stone_count = 0
-        normal_kidney_count = 0
+            # Send the image for inference for YOLOv8m
+            data["model"] = "https://hub.ultralytics.com/models/SMt917G5PhT5W142f1Iq"  # YOLOv8m
+            with open(image_path, "rb") as f:
+                response_v8 = requests.post(url_yolov8, headers=headers, data=data, files={"file": f})
+            response_v8.raise_for_status()
+            results_v8 = response_v8.json()
 
-        # Iterate through the results and calculate confidence
-        for detection in results["images"][0]["results"]:
-            box = detection["box"]
-            x1, y1, x2, y2 = box["x1"], box["y1"], box["x2"], box["y2"]
-            label = f'{detection["name"]} ({detection["confidence"]:.2f})'
+            # Load the images and draw results for both models
+            original_image = Image.open(image_path)
+            draw_v11 = ImageDraw.Draw(original_image)
+            draw_v8 = ImageDraw.Draw(original_image)
 
-            # Check if the detected object is a "kidney-stone"
-            if "kidney-stone" in detection["name"].lower():
-                kidney_stone_detected = True
-                total_confidence += detection["confidence"]
-                kidney_stone_count += 1
+            # Optional: Load a font for text (fallback if not found)
+            try:
+                font = ImageFont.truetype("arial.ttf", 20)
+            except IOError:
+                font = ImageFont.load_default()
 
-            # Check if the detected object is a "normal kidney"
-            elif "normal kidney" in detection["name"].lower():
-                normal_kidney_detected = True
-                total_confidence += detection["confidence"]
-                normal_kidney_count += 1
+            def process_results(results, draw):
+                kidney_stone_detected = False
+                normal_kidney_detected = False
+                total_confidence = 0
+                kidney_stone_count = 0
+                normal_kidney_count = 0
 
-            # Draw rectangle and label (as in your original code)
-            draw.rectangle([(x1, y1), (x2, y2)], outline="red", width=3)
-            
-            # Adjust the y position for label text to avoid overlap with the bounding box
-            label_y = y1 - 15 if y1 - 15 > 0 else y2 + 5
-            label_y = label_y if label_y > 5 else y2 + 10  # Additional check to avoid out-of-bounds
-            
-            # Draw label
-            draw.text((x1, label_y), label, fill="red", font=font)
+                for detection in results["images"][0]["results"]:
+                    box = detection["box"]
+                    x1, y1, x2, y2 = box["x1"], box["y1"], box["x2"], box["y2"]
+                    label = f'{detection["name"]} ({detection["confidence"]:.2f})'
 
-        # Add the result label
-        if kidney_stone_detected:
-            average_confidence = total_confidence / kidney_stone_count
-            result_label = f"Result: Kidney Stone Detected \n Average Confidence: {average_confidence:.2f}"
-        elif normal_kidney_detected:
-            average_confidence = total_confidence / normal_kidney_count
-            result_label = f"Result: Normal Kidney \n Average Confidence: {average_confidence:.2f}"
-        else:
-            result_label = "Result: No Kidney Detected"
+                    # Check if the detected object is a "kidney-stone"
+                    if "kidney-stone" in detection["name"].lower():
+                        kidney_stone_detected = True
+                        total_confidence += detection["confidence"]
+                        kidney_stone_count += 1
 
-        st.subheader(result_label)
+                    # Check if the detected object is a "normal kidney"
+                    elif "normal kidney" in detection["name"].lower():
+                        normal_kidney_detected = True
+                        total_confidence += detection["confidence"]
+                        normal_kidney_count += 1
 
+                    # Draw rectangle and label
+                    draw.rectangle([(x1, y1), (x2, y2)], outline="red", width=3)
 
-        # Optionally print out the full JSON for debugging
-        st.json(results)
+                    label_y = y1 - 15 if y1 - 15 > 0 else y2 + 5
+                    label_y = label_y if label_y > 5 else y2 + 10  # Additional check to avoid out-of-bounds
+                    draw.text((x1, label_y), label, fill="red", font=font)
 
-        # Convert the image to RGB if it has an alpha channel
-        if original_image.mode == "RGBA":
-            original_image = original_image.convert("RGB")
+                # Add result text
+                if kidney_stone_detected:
+                    average_confidence = total_confidence / kidney_stone_count
+                    result_label = f"Kidney Stone Detected \n Average Confidence: {average_confidence:.2f}"
+                elif normal_kidney_detected:
+                    average_confidence = total_confidence / normal_kidney_count
+                    result_label = f"Normal Kidney \n Average Confidence: {average_confidence:.2f}"
+                else:
+                    result_label = "No Kidney Detected"
+                return result_label
 
-        # Save and display the image with annotations
-        annotated_image_path = "annotated_image.jpg"
-        original_image.save(annotated_image_path)
-        st.image(original_image, caption="Annotated Image with Predictions")
+            # Process and display results for both models
+            result_v11 = process_results(results_v11, draw_v11)
+            result_v8 = process_results(results_v8, draw_v8)
 
-        # Optionally download the annotated image
-        with open(annotated_image_path, "rb") as f:
-            st.download_button(
-                label="Download Annotated Image",
-                data=f,
-                file_name="annotated_image.jpg",
-                mime="image/jpeg"
-            )
+            # Display the annotated images for both models side by side
+            col1, col2 = st.columns(2)
 
-    except Exception as e:
-        st.error(f"Error during prediction: {e}")
+            with col1:
+                st.subheader("YOLOv11m Prediction")
+                st.image(original_image, caption=f"{result_v11}")
+
+            with col2:
+                st.subheader("YOLOv8m Prediction")
+                st.image(original_image, caption=f"{result_v8}")
+
+        except Exception as e:
+            st.error(f"Error: {e}")
