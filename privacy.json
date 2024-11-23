@@ -1,0 +1,26 @@
+{
+    "privacy_policy": {
+        "sections": [
+            {
+                "title": "Data Storage Disclaimer",
+                "content": "Your privacy and data security are our highest priorities. By participating in this survey, you agree to the following terms regarding the collection and use of your data."
+            },
+            {
+                "title": "Data Storage",
+                "content": "We only store the survey responses you provide. Your uploaded image is processed temporarily for analysis during this survey and is not saved or retained after processing."
+            },
+            {
+                "title": "Purpose of Data Collection",
+                "content": "The information collected through this survey will be used solely for academic research purposes. Our goal is to analyze the accuracy and effectiveness of our kidney stone detection model as part of our study. Your data will not be used for commercial purposes or shared with third parties outside of the research team."
+            },
+            {
+                "title": "Confidentiality",
+                "content": "Your personal information will be kept confidential and used only to validate the survey responses. In any reports or publications resulting from this research, data will be presented in an aggregated manner, ensuring that individual responses cannot be identified."
+            },
+            {
+                "title": "Voluntary Participation",
+                "content": "Participation in this survey is voluntary, and you may withdraw at any time. Should you choose to withdraw, any data collected up to that point will be deleted from our records."
+            }
+        ]
+    }
+}
