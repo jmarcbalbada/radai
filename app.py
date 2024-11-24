@@ -3,6 +3,7 @@ import requests
 import json
 from PIL import Image, ImageDraw, ImageFont
 import time
+import io
 
 # Title for the app
 st.title("RadAI: Kidney Stone Detection")
@@ -21,6 +22,14 @@ with st.expander("Privacy Policy", expanded=False):  # Default not expanded
     for section in privacy_data["privacy_policy"]["sections"]:
         st.subheader(section["title"])
         st.write(section["content"])
+
+# Add a button for the user survey form
+# st.markdown(
+#     """
+#     Your feedback matters to us! We would greatly appreciate it if you could take a moment to participate in our 
+#     [User Acceptance Survey](https://forms.gle/CtFBdkfj39ZwRZrNA). Your insights will help us improve RadAI and ensure it meets your needs effectively.
+#     """
+# )
 
 # Add a checkbox for user agreement
 agree = st.checkbox("I agree to the Privacy Policy")
@@ -60,7 +69,7 @@ if agree:
     # Inference and Overlay
     if image_path:
         # Display the loading message while making predictions
-        with st.spinner("Predicting, please wait..."):
+        with st.spinner("Please wait..."):
             # URLs and API setup for both models
             url_yolov11 = "https://predict.ultralytics.com"
             url_yolov8 = "https://predict.ultralytics.com"
@@ -130,11 +139,13 @@ if agree:
 
                     # Add result text
                     if kidney_stone_detected:
-                        average_confidence = total_confidence / kidney_stone_count
-                        result_label = f"Kidney Stone Detected \n Average Confidence: {average_confidence:.2f}"
+                        # average_confidence = total_confidence / kidney_stone_count
+                        average_confidence = (total_confidence / kidney_stone_count) * 100
+                        result_label = f"Kidney Stone Detected \n Average Confidence: {average_confidence:.2f}%"
                     elif normal_kidney_detected:
-                        average_confidence = total_confidence / normal_kidney_count
-                        result_label = f"Normal Kidney \n Average Confidence: {average_confidence:.2f}"
+                        # average_confidence = total_confidence / normal_kidney_count
+                        average_confidence = (total_confidence / normal_kidney_count) * 100
+                        result_label = f"Normal Kidney \n Average Confidence: {average_confidence:.2f}%"
                     else:
                         result_label = "No Kidney Detected"
                     return result_label
@@ -153,6 +164,26 @@ if agree:
                 with col2:
                     st.subheader("YOLOv8m Prediction")
                     st.image(original_image, caption=f"{result_v8}")
+
+                # Save the annotated image to a BytesIO object for download
+                buffered = io.BytesIO()
+                original_image.save(buffered, format="PNG")
+                buffered.seek(0)
+
+                # Add a download button for the annotated image
+                st.download_button(
+                    label="Download Predicted Image",
+                    data=buffered,
+                    file_name="predicted_image.png",
+                    mime="image/png"
+                )
+
+                st.markdown(
+                    """
+                    Your feedback matters to us! We would greatly appreciate it if you could take a moment to participate in our 
+                    [User Acceptance Survey](https://forms.gle/CtFBdkfj39ZwRZrNA). Your insights will help us improve RadAI and ensure it meets your needs effectively.
+                    """
+                )
 
             except Exception as e:
                 st.error(f"Error: {e}")
