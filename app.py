@@ -7,11 +7,13 @@ import io
 from io import BytesIO
 
 # Display the header image
-image_url = "https://uwnewsroom-prod-backend.parallelpublicworks.com/sites/default/files/gettyimages-843352558_2.jpg"
+# image_url = "https://uwnewsroom-prod-backend.parallelpublicworks.com/sites/default/files/gettyimages-843352558_2.jpg"
+image_url = "header_kidneystone.jpg"
 # st.image("header_kidneystone.jpg", use_container_width=True, height=350)
 # Fetch the image and resize it
-response = requests.get(image_url)
-img = Image.open(BytesIO(response.content))
+# response = requests.get(image_url)
+# img = Image.open(BytesIO(response.content))
+img = Image.open(image_url)
 img = img.resize((img.width, 350))  # Resize based on height
 
 # Display the resized image
