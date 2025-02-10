@@ -155,7 +155,7 @@ if agree:
                     # Add result text
                     if kidney_stone_detected:
                         average_confidence = (total_confidence / kidney_stone_count) * 100
-                        result_label = f"Kidney Stone Detected \n Average Confidence: {average_confidence:.2f}%"
+                        result_label = f"Kidney Stone Detected"
                     elif normal_kidney_detected:
                         average_confidence = (total_confidence / normal_kidney_count) * 100
                         result_label = f"Normal Kidney \n Average Confidence: {average_confidence:.2f}%"
