@@ -22,11 +22,13 @@ st.image(img, use_container_width=True)
 
 
 # Title for the app
-st.title("RadAI: Kidney Stone Detection")
+st.title("RadAI: Kidney Stone Detection 🩺")
 st.markdown("""
     **RadAI** is an AI-powered binary classification tool designed to assist in detecting kidney stones in ultrasound images. 
     The model classifies images into two categories: **Kidney Stone Detected** or **Normal Kidney**. 
     Simply upload or capture an image, and RadAI will process it and provide real-time results based on the analysis.
+            
+    We **REQUIRE** all users to complete the **User Acceptance Testing (UAT) survey** to help improve our system. Please access the survey [here](https://forms.gle/XcHB2Y57JT7FWFPSA).
 """)
 
 # Load the privacy.json file
@@ -86,7 +88,7 @@ if agree:
     # Inference and Overlay
     if image_path:
         # Display the loading message while making predictions
-        with st.spinner("Please wait..."):
+        with st.spinner("Processing! 🩺 please wait... "):
             # URLs and API setup for both models
             url_yolov8 = "https://predict.ultralytics.com"
             headers = {"x-api-key": "3b5056ac3a9ea918ac838037d777446ba97e9ad3fc"}
